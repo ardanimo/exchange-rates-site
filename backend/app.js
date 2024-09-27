@@ -18,7 +18,7 @@ app.post("/api/search", async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: false,
     })
     const page = await browser.newPage()
     await page.goto("https://finance.yahoo.com", {
@@ -37,8 +37,8 @@ app.post("/api/search", async (req, res) => {
 
     await page.waitForSelector(".livePrice")
 
-    const changes = await page.evaluate(() => {
-      let changes = []
+    const stockData = await page.evaluate(() => {
+      let stockData = []
       let stocks = []
       let tempText = ""
 
@@ -90,7 +90,7 @@ app.post("/api/search", async (req, res) => {
         text: tempText,
       }
 
-      changes.push(
+      stockData.push(
         stockName,
         livePrice,
         dailyChange,
@@ -98,11 +98,11 @@ app.post("/api/search", async (req, res) => {
         monthlyChange,
         yearlyChange
       )
-      return changes
+      return stockData
     })
-    console.log(changes)
+    console.log(stockData)
 
-    res.json(changes)
+    res.json(stockData)
   } catch (error) {}
 })
 
